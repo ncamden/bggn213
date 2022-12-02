@@ -1,0 +1,66 @@
+---
+title: "Lab 08"
+author: "Nichelle Camden"
+format: html
+editor: visual
+toc: TRUE
+---
+
+## Unsupervised Learning Analysis of Human Breast Cancer Cells
+
+#1. Exploratory data analysis
+Importing the data
+```{r}
+fna.data <- "WisconsinCancer.csv"
+wisc.df <- read.csv(fna.data, row.names=1) 
+#head (wisc.df)
+```
+Assigning the data to an object called `fna.data` and saving the input file into the project directory.
+Then, storing as wisc.df
+
+Getting rid of the first column because it's unnecessary.
+```{r}
+wisc.data <- wisc.df[,-1]
+```
+Creating a new vector for the diagnosis column to use for later. 
+```{r}
+diagnosis <- as.factor(wisc.df$diagnosis)
+```
+
+##Q1. How many observations are in this dataset?
+```{r}
+dim(wisc.df)
+```
+There are 569 rows and 31 columns of observations in this dataset.
+
+##Q2. How many of the observations have a malignant diagnosis?
+```{r}
+wisc.mal <- table(wisc.df$diagnosis)
+wisc.mal
+```
+There are 212 malignant diagnoses.
+
+##Q3. How many variables/features in the data are suffixed with _mean?
+```{r}
+grep("_mean", colnames(wisc.data))
+```
+There are 10 columns suffixed with "_mean"
+
+# 2. Principal Component Analysis
+
+To determine if the data need to be scaled, check the column means and standard deviation
+```{r}
+colMeans(wisc.data)
+apply(wisc.data, 2, sd)
+```
+
+Execute PCA with the prcomp() function on the wisc.data, scaling if appropriate, and assign the output model to wisc.pr.
+```{r}
+wisc.pr <- prcomp(wisc.data)
+summary(wisc.pr)
+```
+
+
+
+
+
