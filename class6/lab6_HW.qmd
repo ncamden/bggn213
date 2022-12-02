@@ -1,0 +1,87 @@
+---
+title: "Lab6_HW"
+author: "Nichelle Camden"
+format: html
+editor: visual
+---
+
+## Lab 6 HW 
+
+First, I'm going to install the bio3d package and call the library.
+
+Then I'm going to call in the pdf files and name them s1-3
+```{r}
+library(bio3d)
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+```
+
+`trim.pdb` produces a smaller PDB object that contains a subset of atoms from the larger object. Here, we're grabbing chain A from each protein and naming them in correlation with the new subset.
+```{r}
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s3, chain="A", elety="CA")
+```
+
+Creating and naming more specific subsets
+```{r}
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+```
+
+
+`plotb3` is going to create a scatter plot (here with a line aesthetic) with the option to add secondary structures in the marginal regions that should correlate with the protein (ie "sse=" should match protein)
+```{r}
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+
+```{r}
+x <- s1.b
+plotb3(x, sse=s1.chainA, typ="l", ylab="Bfactor")
+
+x <- s2.b
+plotb3(x, sse=s1.chainA, typ="l", ylab="Bfactor")
+
+x <- s2.b
+plotb3(x, sse=s2.chainA, typ="l", ylab="Bfactor")
+
+#need to figure out how to make the "sse=" part interchangeable with the protein subset name so the margins are correct
+
+```
+```{r}
+y <- s2.chainA
+
+x <- s2.b
+plotb3(x, sse=y, typ="l", ylab="Bfactor")
+```
+```{r}
+x <- s1.b
+y <- s1.chainA
+plotb3(x, sse=y, typ="l", ylab="Bfactor")
+
+x <- s2.b
+y <- s2.chainA
+plotb3(x, sse=y, typ="l", ylab="Bfactor")
+
+x <- s3.b
+y <- s3.chainA
+plotb3(x, sse=y, typ="l", ylab="Bfactor")
+```
+now to put everything together
+
+```{r}
+visualplot <- function(x) {
+  plotb3(x, sse=y, 
+  typ="l", ylab="Bfactor")
+}
+
+visualplot(s1.b)
+visualplot(s2.b)
+visualplot(s3.b)
+#these all have the same margins, so, not correct
+```
+I think I'm getting closer but the margins are not right :/
