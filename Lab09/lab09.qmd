@@ -1,0 +1,133 @@
+---
+title: "Lab 09"
+author: "Nichelle Camden"
+format: html
+
+---
+
+## 1. Introduction to the RCSB Protein Data Bank (PDB)
+# Q1: What percentage of structures in the PDB are solved by X-Ray and Electron Microscopy.
+
+169,916 out of 196,979 total, about 86%.
+
+#Q2: What proportion of structures in the PDB are protein?
+
+most of them! 171,351 out of 196,979 total, about 87%
+
+#Q3: Type HIV in the PDB website search box on the home page and determine how many HIV-1 protease structures are in the current PDB?
+
+22,183
+
+# 2. Visualizing the HIV-1 protease structure
+## Viewing PDB sturctures with Mol*
+
+![](1HSG.png)
+
+# Reading and working with structyres in R
+
+The `bio3d` package for structural bioinformatics has a lot of features for reading and working with biomolecular sequences and structures.
+```{r}
+
+library(bio3d)
+pdb <- read.pdb("1HSG")
+pdb
+
+```
+
+
+```{r}
+adk <- read.pdb("6s36")
+adk
+```
+
+
+Normal mode analysis (NMA) is a bioinformatics method for predicting functional motions. It will show us the parts of the protein that are "flexible" (i.e. the most dynamic).
+```{r}
+m <- nma(adk)
+plot(m)
+```
+
+Make a "movie" of this thing moving.
+```{r}
+mktrj(m, file="adk_nma.pdb")
+```
+
+# Comparative analysis of all ADK structures
+
+First, we get the sequence of ADK and use this to search the PDB database.
+```{r}
+aa <- get.seq("1ake_a")
+aa
+```
+Run a blast search of the PDB database using this sequence
+```{r}
+blast <- blast.pdb(aa)
+#blast
+```
+
+examine the results
+```{r}
+hits <- plot(blast)
+
+```
+download all the ADK structures in the PDB database
+```{r}
+hits$pdb.id
+```
+
+```{r}
+#pdb.annotate(hits$pdb.id)
+```
+
+```{r}
+# Download related PDB files
+files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
+```
+Viewing all these structures looks like a mess.
+We need to try something else...
+
+We will align and superimpose these structures.
+
+```{r}
+library("BiocManager")
+pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
+#pdbs
+```
+
+```{r}
+# Vector containing PDB codes for figure axis
+ids <- basename.pdb(pdbs$id)
+```
+
+
+```{r}
+# Draw schematic alignment
+plot(pdbs, labels=ids)
+```
+
+## PCA to the rescue...
+```{r}
+pc.xray <- pca(pdbs)
+```
+and plot my results
+```{r}
+plot(pc.xray)
+```
+
+```{r}
+# Calculate RMSD
+rd <- rmsd(pdbs)
+```
+
+
+```{r}
+# Structure-based clustering
+hc.rd <- hclust(dist(rd))
+grps.rd <- cutree(hc.rd, k=3)
+```
+
+
+```{r}
+plot(pc.xray, 1:2, col="grey50", bg=grps.rd, pch=21, cex=1)
+```
+
